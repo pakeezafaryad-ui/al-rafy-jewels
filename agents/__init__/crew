@@ -1,0 +1,40 @@
+import streamlit as st
+
+def get_ai_stylist_response(occasion, style, budget, extra, products):
+    """Use Groq when configured; otherwise provide honest catalogue-based guidance."""
+    try:
+        api_key = st.secrets.get("GROQ_API_KEY", "")
+        model = st.secrets.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+    except Exception:
+        api_key, model = "", "llama-3.3-70b-versatile"
+
+    if not products:
+        return "I couldn't find in-stock catalogue items within this budget. Try a higher budget or a different category."
+
+    catalogue = "\n".join(
+        f"- {p['name']}: PKR {p['price']:.0f}; category {p['category']}; "
+        f"material {p['material']}; description {p['description']}"
+        for p in products[:10]
+    )
+    if api_key:
+        try:
+            from groq import Groq
+            client = Groq(api_key=api_key)
+            response = client.chat.completions.create(
+                model=model,
+                temperature=0.3,
+                messages=[
+                    {"role": "system", "content":
+                     "You are the polite jewellery stylist for Al Rafy Jewels. "
+                     "Only recommend items from the supplied catalogue. Never invent prices, materials, stock or product claims. "
+                     "If information is missing, say so. Keep the answer concise."},
+                    {"role": "user", "content":
+                     f"Occasion: {occasion}\nStyle: {style}\nBudget PKR: {budget}\nExtra preference: {extra}\n"
+                     f"Matching catalogue:\n{catalogue}\nGive suitable recommendations."}
+                ]
+            )
+            return response.choices[0].message.content
+        except Exception:
+            pass
+    names = ", ".join(p["name"] for p in products[:3])
+    return f"For a {occasion.lower()} with a {style.lower()} preference, consider: {names}. These catalogue matches fit your stated budget. Add a Groq API key in Streamlit secrets to enable AI-written styling advice."
