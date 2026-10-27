@@ -1,0 +1,39 @@
+{
+  "name": "Al Rafy Jewels - Complaint Notification Starter",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "al-rafy-complaint",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook-node",
+      "name": "Complaint Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [260, 300],
+      "webhookId": "al-rafy-complaint"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? $json; if (!body.reference || !body.subject || !body.message) { throw new Error('Missing required complaint fields'); } return [{json: {reference: String(body.reference).slice(0, 40), subject: String(body.subject).slice(0, 200), category: String(body.category ?? 'Other').slice(0, 100), priority: String(body.priority ?? 'Normal').slice(0, 30), message: String(body.message).slice(0, 5000), customerEmail: String(body.email ?? '').slice(0, 254)}}];"
+      },
+      "id": "validate-node",
+      "name": "Validate and Normalise",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300]
+    }
+  ],
+  "connections": {
+    "Complaint Webhook": {
+      "main": [[{"node": "Validate and Normalise", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "starter-version"
+}
