@@ -1,0 +1,15 @@
+# Copy these keys into Streamlit Community Cloud > App settings > Secrets.
+# Never commit real values or this file renamed to secrets.toml.
+
+GROQ_API_KEY = ""
+GROQ_MODEL = "llama-3.3-70b-versatile"
+
+RESEND_API_KEY = ""
+OWNER_EMAIL = "your-business-email@example.com"
+SENDER_EMAIL = "verified-sender@example.com"
+
+ADMIN_PASSWORD = ""
+
+# Optional: n8n integration is configured in a later step.
+N8N_WEBHOOK_URL = ""
+N8N_WEBHOOK_SECRET = ""
